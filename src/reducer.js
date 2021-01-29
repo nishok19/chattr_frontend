@@ -1,12 +1,16 @@
 export const initialState = {
   user: null,
   room: [],
+  jwt: "",
 };
 
 export const actionTypes = {
   SET_USER: "SET_USER",
   SET_ROOM: "SET_ROOM",
   SET_MESSAGE: "SET_MESSAGE",
+  INSERT_NEW_ROOM: "INSERT_NEW_ROOM",
+  SIGNOUT_USER: "SIGNOUT_USER",
+  SET_JWT: "SET_JWT",
 };
 
 const reducer = (state, action) => {
@@ -18,6 +22,12 @@ const reducer = (state, action) => {
       return {
         ...state,
         room: action.room,
+      };
+
+    case actionTypes.INSERT_NEW_ROOM:
+      return {
+        ...state,
+        room: [...state.room, action.room],
       };
 
     case actionTypes.SET_MESSAGE: {
@@ -33,6 +43,19 @@ const reducer = (state, action) => {
         room: actualRooms,
       };
     }
+
+    case actionTypes.SIGNOUT_USER: {
+      return {
+        user: null,
+        room: [],
+      };
+    }
+
+    case actionTypes.SET_JWT:
+      return {
+        ...state,
+        jwt: action.accessToken,
+      };
 
     default:
       return state;

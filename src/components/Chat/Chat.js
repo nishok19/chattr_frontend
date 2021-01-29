@@ -7,12 +7,12 @@ import InsertEmoticonIcon from "@material-ui/icons/InsertEmoticon";
 import MicIcon from "@material-ui/icons/Mic";
 // import db from "./firebase";
 import firebase from "firebase";
-import axios from "./axios";
+import axios from "../../axios";
 import Pusher from "pusher-js";
 
 import { useParams } from "react-router-dom";
-import { actionTypes } from "./reducer";
-import { useStateValue } from "./StateProvider";
+import { actionTypes } from "../../reducer";
+import { useStateValue } from "../../StateProvider";
 
 const Chat = () => {
   const [seed, setSeed] = useState("");
@@ -71,9 +71,9 @@ const Chat = () => {
       const room_data = room.filter((room) => {
         return room._id == roomId;
       })[0];
-      setRoomName(room_data.name);
+      setRoomName(room_data?.name);
       // const msg = msgs.filter((msg) => msg.roomId === roomId);
-      setMessages(room_data.data);
+      setMessages(room_data?.data);
       // setMessages(msgs);
     }
   }, [roomId, room, messages]);
@@ -125,7 +125,7 @@ const Chat = () => {
 
       {/* Chat Body */}
       <div className="chat__body">
-        {messages.map((message) => (
+        {messages?.map((message) => (
           <p
             key={message._id}
             className={`chat__message ${

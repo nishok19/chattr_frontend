@@ -1,0 +1,108 @@
+.signup {
+  background-color: #f8f8f8;
+  height: 100vh;
+  width: 100vw;
+  display: grid;
+  place-items: center;
+}
+.container {
+  height: 100vh;
+  width: 30vw;
+  display: flex;
+  flex-direction: column;
+  position: absolute;
+  background-color: white;
+  padding: 20px;
+  padding-bottom: 70px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 3px rgba(0, 0, 0, 0.5);
+  border-radius: 7px;
+  margin-left: 0;
+  margin-top: 0;
+}
+.signup__form {
+  display: flex;
+  flex-direction: column;
+}
+.signup__el {
+  margin-top: 20px !important;
+  width: 19vw !important;
+  align-self: center !important;
+}
+.signup__button {
+  margin-top: 30px !important;
+  color: white !important;
+  background-color: #131a08 !important;
+  align-self: center !important;
+  border-radius: 20px !important;
+  padding: 7px !important;
+  width: 19vw !important;
+}
+
+.signup__button:hover {
+  margin-top: 30px !important;
+  color: #131a08 !important;
+  background-color: #81bb24 !important;
+  align-self: center !important;
+  border-radius: 20px !important;
+  padding: 7px !important;
+  width: 19vw !important;
+}
+
+.signup__heading {
+  color: #131a08;
+  text-shadow: 2px 2px 3px #b6b4b4;
+  font-family: "Brush Script MT";
+  letter-spacing: 3px;
+  font-size: larger;
+  text-align: center;
+}
+
+.signup__heading2 {
+  color: #131a08;
+  text-shadow: 2px 2px 5px #b6b4b4;
+  font-family: "Brush Script MT";
+  letter-spacing: 3px;
+  font-size: smaller;
+  margin-top: 15px;
+  text-align: center;
+}
+
+.signup__heading3 {
+  color: #131a08;
+  text-shadow: 2px 2px 5px #b6b4b4;
+  font-family: "Brush Script MT";
+  letter-spacing: 3px;
+  font-size: smaller;
+  margin-top: 15px;
+  text-align: center;
+}
+
+.signup__heading3__link {
+  color: blue;
+  text-shadow: 2px 2px 5px #b6b4b4;
+  font-family: "Brush Script MT";
+  letter-spacing: 3px;
+  font-size: large;
+  margin-top: 15px;
+  text-align: center;
+}
+
+.signup__google__button {
+  color: #131a08 !important;
+  background-color: aquamarine !important;
+  align-self: center !important;
+  border-radius: 20px !important;
+  margin-top: 15px !important;
+  margin-bottom: 15px !important;
+  padding: 7px !important;
+}
+
+.signup__google__button:hover {
+  color: #f8f8f8 !important;
+  background-color: #131a08 !important;
+  align-self: center !important;
+  border-radius: 20px !important;
+  margin-top: 15px !important;
+  margin-bottom: 15px !important;
+  padding: 7px !important;
+}

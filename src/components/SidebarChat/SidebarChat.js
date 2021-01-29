@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
 import "./SidebarChat.css";
 import { Avatar } from "@material-ui/core";
-import db from "./firebase";
 import { Link } from "react-router-dom";
+import axios from "../../axios";
 
 const SidebarChat = ({ id, name, addNewChat }) => {
   const [seed, setSeed] = useState("");
@@ -24,14 +24,15 @@ const SidebarChat = ({ id, name, addNewChat }) => {
     setSeed(Math.floor(Math.random() * 5000));
   }, []);
 
-  const createChat = () => {
+  const createChat = async () => {
     const roomName = prompt("Please enter a name for the chat");
 
     if (roomName) {
-      // some database stuff
-      // db.collection("rooms").add({
-      //   name: roomName,
-      // });
+      await axios.post(`/rooms`, {
+        name: roomName,
+        data: [],
+        users: ["nishok", "mahi"],
+      });
     }
   };
 

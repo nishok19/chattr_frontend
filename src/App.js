@@ -1,60 +1,92 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import "./App.css";
-import Sidebar from "./Sidebar";
-import Chat from "./Chat";
-import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
-import Login from "./Login";
+import {
+  BrowserRouter as Router,
+  Switch,
+  Route,
+  useHistory,
+} from "react-router-dom";
+import Login from "./components/Login/Login";
+import Sidebar from "./components/Sidebar/Sidebar";
+import Chat from "./components/Chat/Chat";
+import Home from "./components/Home/Home";
+import Signup from "./components/Singup/Signup";
 import Pusher from "pusher-js";
 import axios from "./axios";
 
 import { actionTypes } from "./reducer";
 import { useStateValue } from "./StateProvider";
+import { auth, provider } from "./firebase";
 
 const App = () => {
-  const [{ user, room }, dispatch] = useStateValue();
+  const [{ user, room, jwt }, dispatch] = useStateValue();
+  const [err, setErr] = useState("");
+  const history = useHistory();
 
   useEffect(() => {
-    axios.get("/rooms").then((res) => {
-      // console.log(res.data);
+    const token = localStorage.getItem("chattrJWT");
+    if (token) {
+      const accessToken = `Bearer ${token}`;
       dispatch({
-        type: actionTypes.SET_ROOM,
-        room: res.data.map((room) => room),
+        type: actionTypes.SET_JWT,
+        accessToken,
       });
-      // console.log(room);
-    });
+      getUserWithJWT(accessToken);
+      // console.log(jwt);
+    }
   }, []);
 
-  // pusher
+  const getUserWithJWT = async (accessToken) => {
+    try {
+      await axios
+        .get("/auth/login", {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: accessToken,
+          },
+        })
+        .then((res) => {
+          console.log(res);
+          const userData = res.data;
+          if (userData.userExists) {
+            // Executing only if the server sends that the {userExists:true}
+            // setError("");
+            console.log("user exists");
+            dispatch({
+              type: actionTypes.SET_USER,
+              user: res.data.user,
+            });
+          } else if (!userData.userExists) {
+            // setError("user does not exists... First sign up");
+            history.push("/login");
+          } else {
+            // setError("Something went wrong");
+            console.log("issue with logging in the user");
+          }
+        })
+        .catch((err) => {
+          console.log("login", err);
+        });
+    } catch {
+      console.log("problem with logging in");
+    }
+  };
 
+  // pusher
   useEffect(() => {
     const pusher = new Pusher("ef3c3aa07c44c7f445e9", {
       cluster: "ap2",
     });
 
     const channelRoom = pusher.subscribe("rooms");
-    channelRoom.bind("inserted", (data) => {
-      alert(JSON.stringify(data));
-      console.log("pusher room", data);
-      // dispatch({
-      //   type: actionTypes.SET_ROOM,
-      //   room: {...room,},
-      // });
+    channelRoom.bind("inserted", (room) => {
+      // alert(JSON.stringify(data));
+      console.log("pusher room", room);
+      dispatch({
+        type: actionTypes.INSERT_NEW_ROOM,
+        room: room,
+      });
     });
-
-    // const channelMessage = pusher.subscribe("messages");
-    // channelRoom.bind("updated", (data) => {
-    //   const msg = data.data;
-    //   const roomId = data.roomId._id;
-    //   console.log("pusher msg 1 ", msg);
-    //   console.log("pusher msg 2 ", roomId);
-    // updatedRoom = room.filter((r) => r._id == roomId);
-
-    // dispatch({
-    //   type: actionTypes.SET_MESSAGE,
-    //   roomId: roomId,
-    //   msg: msg,
-    // });
-    // });
 
     return () => {
       channelRoom.unbind_all();
@@ -64,19 +96,30 @@ const App = () => {
 
   return (
     <div className="app">
-      {/* after completion change the 'user' to '!user */}
+      {/* <Router> */}
+      {/* <Home /> */}
+      {/* </Router> */}
       {!user ? (
-        <Login />
+        <Router>
+          <Switch>
+            <Route exact path="/" component={Home} />
+
+            <Route exact path="/login" component={Login} />
+
+            <Route exact path="/signup" component={Signup} />
+          </Switch>
+        </Router>
       ) : (
         <div className="app__body">
           <Router>
-            <Sidebar />
             <Switch>
+              {/* <Route path="/rooms"> */}
+              <Sidebar />
               <Route path="/rooms/:roomId">
                 <Chat />
               </Route>
-              <Route path="/">{/* <Chat /> */}</Route>
             </Switch>
+            {/* <Redirect to="/login" /> */}
           </Router>
         </div>
       )}
