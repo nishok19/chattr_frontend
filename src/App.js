@@ -8,6 +8,7 @@ import {
 } from "react-router-dom";
 import Login from "./components/Login/Login";
 import Sidebar from "./components/Sidebar/Sidebar";
+import Detailsbar from "./components/Detailsbar/Detailsbar";
 import Chat from "./components/Chat/Chat";
 import Home from "./components/Home/Home";
 import Signup from "./components/Singup/Signup";
@@ -16,7 +17,7 @@ import axios from "./axios";
 
 import { actionTypes } from "./reducer";
 import { useStateValue } from "./StateProvider";
-import { auth, provider } from "./firebase";
+// import { auth, provider } from "./firebase";
 
 const App = () => {
   const [{ user, room, jwt }, dispatch] = useStateValue();
@@ -32,6 +33,7 @@ const App = () => {
         accessToken,
       });
       getUserWithJWT(accessToken);
+      // history.push("/rooms");
       // console.log(jwt);
     }
   }, []);
@@ -96,13 +98,10 @@ const App = () => {
 
   return (
     <div className="app">
-      {/* <Router> */}
-      {/* <Home /> */}
-      {/* </Router> */}
       {!user ? (
         <Router>
           <Switch>
-            <Route exact path="/" component={Home} />
+            <Route exact path="/home" component={Home} />
 
             <Route exact path="/login" component={Login} />
 
@@ -113,13 +112,14 @@ const App = () => {
         <div className="app__body">
           <Router>
             <Switch>
-              {/* <Route path="/rooms"> */}
-              <Sidebar />
-              <Route path="/rooms/:roomId">
-                <Chat />
+              <Route path="/">
+                <Sidebar />
+                <Route exact path="/rooms/:roomId">
+                  <Chat />
+                  <Detailsbar />
+                </Route>
               </Route>
             </Switch>
-            {/* <Redirect to="/login" /> */}
           </Router>
         </div>
       )}

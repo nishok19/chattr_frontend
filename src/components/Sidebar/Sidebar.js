@@ -1,27 +1,33 @@
 import React, { useState, useEffect } from "react";
 import "./Sidebar.css";
-
 import { Avatar, IconButton } from "@material-ui/core";
 // import DonutLargeIcon from "@material-ui/icons/DonutLarge";
 import ChatIcon from "@material-ui/icons/Chat";
 import MoreVertIcon from "@material-ui/icons/MoreVert";
-import { SearchOutlined } from "@material-ui/icons";
 import ExitToAppIcon from "@material-ui/icons/ExitToApp";
 import SidebarChat from "../SidebarChat/SidebarChat";
 import firebase from "firebase";
+import GroupModal from "./GroupModal/GroupModal";
+import Menu from "@material-ui/core/Menu";
+import MenuItem from "@material-ui/core/MenuItem";
 
 import axios from "../../axios";
 import { actionTypes } from "../../reducer";
 import { useStateValue } from "../../StateProvider";
-import { useHistory } from "react-router-dom";
+import { useHistory, useParams } from "react-router-dom";
 
 const Sidebar = () => {
   // const [rooms, setRooms] = useState([]);
-  const [{ user, room, jwt }, dispatch] = useStateValue();
+  const [{ user, room, jwt, people, currentRoom }, dispatch] = useStateValue();
   const [err, setErr] = useState("");
   const [seed, setSeed] = useState("");
+  const { roomId } = useParams();
+  const [roomName, setRoomName] = useState("");
+  const [anchorEl, setAnchorEl] = useState(null);
 
   const history = useHistory();
+
+  useEffect(() => {}, [roomId]);
 
   // Fetching the ROOMS and the initial messages from the server
   useEffect(() => {
@@ -36,10 +42,17 @@ const Sidebar = () => {
             },
           })
           .then((res) => {
-            // dispatch({
-            //   type: actionTypes.SET_ROOM,
-            //   room: res.data.map((room) => room),
-            // });
+            dispatch({
+              type: actionTypes.SET_ROOM,
+              room: res.data.data.map((room) => room),
+              // room: res.data.room,
+            });
+            dispatch({
+              type: actionTypes.SET_PEOPLE,
+              people: res.data.peoples.map((p) => p),
+              // room: res.data.room,
+            });
+
             console.log("fetched the rooms", res);
           })
           .catch((err) => {
@@ -74,15 +87,6 @@ const Sidebar = () => {
 
   // Testing__End
 
-  const checkUser = () => {
-    var user = firebase.auth().currentUser;
-    if (user) {
-      console.log(user);
-    } else {
-      console.log("not yet signed in");
-    }
-  };
-
   const signout = async () => {
     await firebase
       .auth()
@@ -100,6 +104,30 @@ const Sidebar = () => {
     localStorage.removeItem("chattrJWT");
   };
 
+  const createGroup = async () => {
+    if (roomName) {
+      await axios
+        .post(`/rooms`, {
+          name: roomName,
+          data: [],
+          users: [user.email],
+        })
+        .then((res) => console.log(res))
+        .catch((err) => console.log(err));
+    }
+
+    console.log(roomName);
+    setRoomName("");
+  };
+
+  // const optionsClick = (event) => {
+  //   setAnchorEl(event.currentTarget);
+  // };
+
+  // const optionsClose = () => {
+  //   setAnchorEl(null);
+  // };
+
   return (
     <div className="sidebar">
       <div className="sidebar__header">
@@ -111,31 +139,48 @@ const Sidebar = () => {
           }
         />
         <div className="sidebar__headerRight">
+          <IconButton onClick={() => console.log(currentRoom)}>
+            <ChatIcon />
+          </IconButton>
+          {/* <IconButton onClick={optionsClick}>
+            <MoreVertIcon />
+          </IconButton> */}
           <IconButton onClick={signout}>
             <ExitToAppIcon />
           </IconButton>
-          <IconButton
-            onClick={() => console.log(localStorage.getItem("chattrJWT"))}
+          {/* Menu */}
+          {/* <Menu
+            id="simple-menu"
+            anchorEl={anchorEl}
+            keepMounted
+            open={Boolean(anchorEl)}
+            onClose={optionsClose}
           >
-            <ChatIcon />
-          </IconButton>
-          <IconButton onClick={checkUser}>
-            <MoreVertIcon />
-          </IconButton>
+            <MenuItem onClick={optionsClose}>Profile</MenuItem>
+            <MenuItem onClick={optionsClose}>My account</MenuItem>
+            <MenuItem onClick={optionsClose}>Logout</MenuItem>
+          </Menu> */}
+          {/*  */}
         </div>
       </div>
 
       <div className="sidebar__search">
-        <div className="sidebar__searchContainer">
-          <SearchOutlined />
-          <input placeholder="Search or start new chat" type="text" />
-        </div>
+        <GroupModal
+          roomName={roomName}
+          setRoomName={setRoomName}
+          onSubmit={createGroup}
+        />
       </div>
 
       <div className="sidebar__chats">
-        <SidebarChat addNewChat />
+        {/* <SidebarChat addNewChat /> */}
         {room.map((r) => (
-          <SidebarChat key={r._id} id={r._id} name={r.name} />
+          <SidebarChat
+            key={r._id}
+            id={r._id}
+            name={r.name}
+            // selected={r._id === roomId}
+          />
         ))}
         {err}
       </div>

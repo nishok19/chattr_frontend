@@ -94,7 +94,6 @@ const Login = () => {
           const userData = res.data;
           if (userData.userExists) {
             // Executing only if the server sends that the {userExists:true}
-
             setError("");
             console.log("user exists");
             localStorage.setItem("chattrJWT", res.data.accessToken);

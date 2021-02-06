@@ -20,9 +20,9 @@ const Chat = () => {
   const { roomId } = useParams();
   const [roomName, setRoomName] = useState("");
   const [messages, setMessages] = useState([]);
-  const [{ user, room }, dispatch] = useStateValue();
+  const [{ user, room, jwt }, dispatch] = useStateValue();
 
-  // new thing
+  // new thing PUSHER
   useEffect(() => {
     const pusher = new Pusher("ef3c3aa07c44c7f445e9", {
       cluster: "ap2",
@@ -31,20 +31,73 @@ const Chat = () => {
     const channelRoom = pusher.subscribe("rooms");
 
     channelRoom.bind("updated", (data) => {
-      const msg = data.data;
-      const msgRoomId = data.roomId._id;
-      // updatedRoom = room.filter((r) => r._id == roomId);
+      console.log("i am testing", data);
+      //
+      if (data.type === "messageUpdate") {
+        const msg = data?.data;
 
-      dispatch({
-        type: actionTypes.SET_MESSAGE,
-        roomId: roomId,
-        msg: msg,
-      });
+        const msgData = Object.values(msg)[1];
+        console.log("i am chat", msgData);
+        if (msgData) {
+          const isRoomFound = room.find((r) => r._id === data.roomId._id);
+          if (isRoomFound) {
+            const msgRoomId = data.roomId._id;
+            // updatedRoom = room.filter((r) => r._id == roomId);
 
-      console.log("i am chat", data);
-      setMessages(() =>
-        roomId === msgRoomId ? [...messages, msg] : [...messages]
-      );
+            dispatch({
+              type: actionTypes.SET_MESSAGE,
+              roomId: msgRoomId,
+              msg: msgData,
+            });
+
+            setMessages(() =>
+              msgRoomId === msgRoomId ? [...messages, msgData] : [...messages]
+            );
+          }
+        }
+      } else if (data.type === "userUpdate") {
+        console.log("i am second chat", data);
+        const isRoomFound = room.find((r) => r._id === data.roomId._id);
+        if (!isRoomFound) {
+          const getRooms = async () => {
+            await axios
+              .get("/rooms", {
+                headers: {
+                  "Content-Type": "application/json",
+                  // user: user.email,
+                  Authorization: jwt,
+                },
+              })
+              .then((res) => {
+                console.log("from chat", res);
+                dispatch({
+                  type: actionTypes.SET_ROOM,
+                  room: res.data.data.map((room) => room),
+                  // room: res.data.room,
+                });
+                dispatch({
+                  type: actionTypes.SET_PEOPLE,
+                  people: res.data.peoples.map((p) => p),
+                  // room: res.data.room,
+                });
+
+                console.log("fetched the rooms", res);
+              })
+              .catch((err) => {
+                console.log("error fetching rooms", err);
+                // signoutInvalid();
+                // setErr(JSON.stringify(err));
+              });
+          };
+          getRooms();
+        } else {
+          dispatch({
+            type: actionTypes.UPDATE_PEOPLE,
+            people: data.userDetails[0],
+            roomId: data.roomId._id,
+          });
+        }
+      }
     });
 
     return () => {
@@ -53,7 +106,7 @@ const Chat = () => {
     };
   }, [roomId, messages]);
 
-  // new thing__end
+  // new thing__end PUSHER
 
   useEffect(() => {
     if (roomId) {
@@ -72,9 +125,11 @@ const Chat = () => {
         return room._id == roomId;
       })[0];
       setRoomName(room_data?.name);
-      // const msg = msgs.filter((msg) => msg.roomId === roomId);
       setMessages(room_data?.data);
-      // setMessages(msgs);
+      dispatch({
+        type: actionTypes.SET_CURRENT_ROOM,
+        room: room_data?._id,
+      });
     }
   }, [roomId, room, messages]);
 
@@ -87,8 +142,8 @@ const Chat = () => {
 
     await axios.put(`/rooms/${roomId}`, {
       message: input,
-      name: "nishok",
-      timestamp: "timestamp",
+      name: user.name,
+      timestamp: Date.now(),
     });
 
     // setMessages([...messages]);
@@ -103,20 +158,20 @@ const Chat = () => {
         <Avatar src={`https://avatars.dicebear.com/api/human/${seed}.svg`} />
         <div className="chat__headerInfo">
           <h3>{roomName}</h3>
-          <p>
-            Last Seen yet to be Updated
-            {/* {new Date(
+          {/* <p> */}
+          {/* Last Seen yet to be Updated */}
+          {/* {new Date(
               messages[messages.length - 1]?.timestamp?.toDate()
             ).toUTCString()} */}
-          </p>
+          {/* </p> */}
         </div>
         <div className="chat__headerRight">
-          <IconButton>
+          {/* <IconButton>
             <SearchOutlined />
           </IconButton>
           <IconButton>
             <AttachFile />
-          </IconButton>
+          </IconButton> */}
           <IconButton>
             <MoreVert />
           </IconButton>
@@ -127,16 +182,21 @@ const Chat = () => {
       <div className="chat__body">
         {messages?.map((message) => (
           <p
-            key={message._id}
+            key={message?._id}
             className={`chat__message ${
-              message.name === "nishok" && "chat__reciever"
-              // user.displayName && "chat__reciever"
+              message?.name === user?.name && "chat__reciever"
             }`}
           >
-            <span className="chat__name">{message.name}</span>
-            {message.message}
+            <span className="chat__name">{message?.name}</span>
+            {message?.message}
             <span className="chat__timestamp">
-              TimeStamp yet to be updated
+              {new Date(message?.createdAt)
+                .toLocaleTimeString([], {
+                  hour12: true,
+                  hour: "2-digit",
+                  minute: "2-digit",
+                })
+                .toString()}
               {/* {new Date(message.timestamp?.toDate()).toUTCString()} */}
             </span>
           </p>
