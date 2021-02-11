@@ -16,6 +16,9 @@ export const actionTypes = {
   SET_PEOPLE: "SET_PEOPLE",
   UPDATE_PEOPLE: "UPDATE_PEOPLE",
   SET_CURRENT_ROOM: "SET_CURRENT_ROOM",
+  DELETE_ROOM: "DELETE_ROOM",
+  LEAVE_ROOM: "LEAVE_ROOM",
+  USER_LEFT: "USER_LEFT",
 };
 
 const reducer = (state, action) => {
@@ -30,9 +33,12 @@ const reducer = (state, action) => {
       };
 
     case actionTypes.INSERT_NEW_ROOM:
+      const userRoomAdd = state.user;
+      userRoomAdd.rooms = state.user.rooms.concat(action.room.name);
       return {
         ...state,
         room: [...state.room, action.room],
+        user: userRoomAdd,
       };
 
     case actionTypes.SET_MESSAGE: {
@@ -82,15 +88,6 @@ const reducer = (state, action) => {
       actualRooms.splice(index, 1, userRoom);
       console.log("actualRoomsUsers", actualRooms);
 
-      // const isPeopleFound = state.people.filter(
-      //   (pep) => pep.email === action.people.email
-      // );
-      // let allPeople = [];
-      // if (!isPeopleFound) {
-      //   allPeople = [...state.people, action.people];
-      // } else {
-      //   allPeople = [...state.people];
-      // }
       const allPeople = [...state.people, action.people];
       const uniquePeople = allPeople
         .map((e) => e["_id"])
@@ -102,6 +99,46 @@ const reducer = (state, action) => {
         ...state,
         people: uniquePeople,
         room: actualRooms,
+      };
+
+    case actionTypes.DELETE_ROOM:
+      const rooms = state.room.filter((room) => room._id !== action.roomId);
+      return {
+        ...state,
+        room: rooms,
+      };
+
+    case actionTypes.LEAVE_ROOM:
+      const userNotLeavingRooms = state.room.filter(
+        (room) => room._id != action.roomId
+      );
+      return {
+        ...state,
+        user: action.user,
+        room: userNotLeavingRooms,
+      };
+
+    case actionTypes.USER_LEFT:
+      const stateRooms = [...state.room];
+      const roomToAlter = stateRooms.filter((r) => r._id === action.roomId)[0];
+      const indexOfAlterRoom = stateRooms.findIndex(
+        (room) => room._id === action.roomId
+      );
+      roomToAlter.users = action.users;
+      stateRooms.splice(indexOfAlterRoom, 1, roomToAlter);
+
+      // const statePeople = state.people;
+      // const alterPeople = action.users.map((u) =>
+      //   state.people.filter((p) => p.email === u)
+      // );
+      // const alterPeople = action.users.map((u) => {
+      //   statePeople.filter((p) => p.email === u);
+      // });
+
+      // console.log("user left", action.users);
+      return {
+        ...state,
+        room: stateRooms,
       };
 
     default:

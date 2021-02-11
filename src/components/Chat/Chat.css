@@ -27,7 +27,7 @@
 
 .chat__headerRight {
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-end;
   min-width: 100px;
 }
 

@@ -20,7 +20,6 @@ const Detailsbar = () => {
   const [inputValue, setInputValue] = useState("");
   const [roomName, setRoomName] = useState("");
   const [seed, setSeed] = useState("");
-  // const [roomUserName, setRoomUserName] = useState([]);
 
   useEffect(() => {
     const room_data = room.filter((room) => {
@@ -28,14 +27,14 @@ const Detailsbar = () => {
     })[0];
     setRoomUsers(room_data?.users);
     setRoomName(room_data?.name);
-    // setRoomUserName(r)
-  }, [roomId, room, people]);
+    console.log("roomUsers", roomUsers);
+  }, [roomId, room, people, roomUsers]);
 
-  useEffect(() => {
-    if (user.photoURL == null) {
-      setSeed(Math.floor(Math.random() * 5000));
-    }
-  }, []);
+  // useEffect(() => {
+  //   if (user.photoURL == null) {
+  //     setSeed(Math.floor(Math.random() * 5000));
+  //   }
+  // }, []);
 
   const onSubmit = async () => {
     if (inputValue) {
@@ -49,7 +48,6 @@ const Detailsbar = () => {
     }
 
     setInputValue("");
-    console.log(inputValue);
   };
 
   return (
@@ -64,8 +62,8 @@ const Detailsbar = () => {
         />
       </div>
       <div className="details__body">
-        {people.map((pep) =>
-          roomUsers.map((user) =>
+        {people?.map((pep) =>
+          roomUsers?.map((user) =>
             user === pep.email ? (
               <div className="details__people" key={user}>
                 <Avatar

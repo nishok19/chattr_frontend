@@ -126,14 +126,19 @@ const Login = () => {
   const getUserWithEmailPassword = async (email, password) => {
     try {
       await axios
-        .post("/auth/login", {
-          headers: {
-            "Content-Type": "application/json",
+        .post(
+          "/auth/login",
+          {
+            email,
+            password,
+            loginType: "emailandpassword",
           },
-          email,
-          password,
-          loginType: "emailandpassword",
-        })
+          {
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        )
         .then((res) => {
           console.log(res);
           const userData = res.data;
@@ -182,10 +187,6 @@ const Login = () => {
     getUserWithEmailPassword(email, password);
   };
 
-  // token == null ? (
-  //(
-  //   history.push("/rooms")
-  // ) : (
   return (
     <StylesProvider injectFirst>
       <ThemeProvider theme={theme}>

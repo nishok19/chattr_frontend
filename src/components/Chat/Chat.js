@@ -2,9 +2,11 @@ import React, { useState, useEffect } from "react";
 import "./Chat.css";
 
 import { Avatar, IconButton } from "@material-ui/core";
-import { AttachFile, MoreVert, SearchOutlined } from "@material-ui/icons";
+import MoreVertIcon from "@material-ui/icons/MoreVert";
 import InsertEmoticonIcon from "@material-ui/icons/InsertEmoticon";
 import MicIcon from "@material-ui/icons/Mic";
+import Menu from "@material-ui/core/Menu";
+import MenuItem from "@material-ui/core/MenuItem";
 // import db from "./firebase";
 import firebase from "firebase";
 import axios from "../../axios";
@@ -19,6 +21,7 @@ const Chat = () => {
   const [input, setInput] = useState("");
   const { roomId } = useParams();
   const [roomName, setRoomName] = useState("");
+  const [anchorEl, setAnchorEl] = useState(null);
   const [messages, setMessages] = useState([]);
   const [{ user, room, jwt }, dispatch] = useStateValue();
 
@@ -97,6 +100,14 @@ const Chat = () => {
             roomId: data.roomId._id,
           });
         }
+      } else if (data.type === "userDelete") {
+        if (data.usersRemain.includes(user.email)) {
+          dispatch({
+            type: actionTypes.USER_LEFT,
+            users: data.usersRemain,
+            roomId: data.roomId._id,
+          });
+        }
       }
     });
 
@@ -140,15 +151,66 @@ const Chat = () => {
   const sendMessage = async (e) => {
     e.preventDefault();
 
-    await axios.put(`/rooms/${roomId}`, {
-      message: input,
-      name: user.name,
-      timestamp: Date.now(),
-    });
+    await axios
+      .put(`/rooms/${roomId}`, {
+        message: input,
+        name: user.name,
+        timestamp: Date.now(),
+      })
+      .then((res) => {
+        console.log(res);
+      })
+      .catch((err) => console.log(err));
 
     // setMessages([...messages]);
 
     setInput("");
+  };
+
+  // Menu Opening and Closing
+  const optionsClick = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const optionsClose = () => {
+    setAnchorEl(null);
+  };
+  // Menu
+
+  // Deleting the Room
+  const deleteRoom = async () => {
+    await axios
+      .delete(`/rooms/${roomId}`, {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: jwt,
+        },
+      })
+      .then((res) => {
+        console.log(res);
+      })
+      .catch((err) => console.log(err));
+  };
+
+  // Leaving the Room
+  const leaveRoom = async () => {
+    await axios
+      .delete(`/rooms/${roomId}/user/${user.email}`, {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: jwt,
+        },
+      })
+      .then((res) => {
+        console.log(res);
+        console.log("pusher leave room", res);
+        dispatch({
+          type: actionTypes.LEAVE_ROOM,
+          user: res.data,
+          roomId: roomId,
+        });
+      })
+      .catch((err) => console.log(err));
   };
 
   return (
@@ -172,9 +234,22 @@ const Chat = () => {
           <IconButton>
             <AttachFile />
           </IconButton> */}
-          <IconButton>
-            <MoreVert />
+          <IconButton onClick={optionsClick}>
+            <MoreVertIcon />
           </IconButton>
+
+          {/* Menu */}
+          <Menu
+            id="simple-menu"
+            anchorEl={anchorEl}
+            keepMounted
+            open={Boolean(anchorEl)}
+            onClose={optionsClose}
+          >
+            <MenuItem onClick={deleteRoom}>Delete Room</MenuItem>
+            <MenuItem onClick={leaveRoom}>Leave Room</MenuItem>
+          </Menu>
+          {/* Menu End */}
         </div>
       </div>
 

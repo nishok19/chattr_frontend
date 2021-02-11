@@ -1,15 +1,13 @@
 import React, { useState, useEffect } from "react";
 import "./Sidebar.css";
 import { Avatar, IconButton } from "@material-ui/core";
-// import DonutLargeIcon from "@material-ui/icons/DonutLarge";
-import ChatIcon from "@material-ui/icons/Chat";
 import MoreVertIcon from "@material-ui/icons/MoreVert";
-import ExitToAppIcon from "@material-ui/icons/ExitToApp";
 import SidebarChat from "../SidebarChat/SidebarChat";
 import firebase from "firebase";
 import GroupModal from "./GroupModal/GroupModal";
 import Menu from "@material-ui/core/Menu";
 import MenuItem from "@material-ui/core/MenuItem";
+import ProfileModal from "./ProfileModal/ProfileModal.js";
 
 import axios from "../../axios";
 import { actionTypes } from "../../reducer";
@@ -101,6 +99,11 @@ const Sidebar = () => {
         console.log("err signing out", err);
       });
 
+    history.push("/login");
+    dispatch({
+      type: actionTypes.SIGNOUT_USER,
+    });
+
     localStorage.removeItem("chattrJWT");
   };
 
@@ -120,13 +123,53 @@ const Sidebar = () => {
     setRoomName("");
   };
 
-  // const optionsClick = (event) => {
-  //   setAnchorEl(event.currentTarget);
-  // };
+  const optionsClick = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
 
-  // const optionsClose = () => {
-  //   setAnchorEl(null);
-  // };
+  const optionsClose = () => {
+    setAnchorEl(null);
+  };
+
+  const userNameUpdate = async (userName) => {
+    if (userName != user.name) {
+      await axios
+        .put(
+          "/auth/login",
+          {
+            change: "userNameUpdate",
+            newUserName: userName,
+          },
+          {
+            headers: {
+              // "Content-Type": "application/json",
+              Authorization: jwt,
+            },
+          }
+        )
+        .then((res) => {
+          dispatch({
+            type: actionTypes.SET_USER,
+            user: res.data,
+          });
+          console.log("username update", res.data);
+        })
+        .catch((err) => console.log(err));
+    }
+  };
+
+  const onDelAcc = async () => {
+    await axios
+      .delete("/auth/login", {
+        headers: {
+          Authorization: jwt,
+        },
+      })
+      .then((res) => {
+        signout();
+      })
+      .catch((err) => console.log(err));
+  };
 
   return (
     <div className="sidebar">
@@ -139,27 +182,28 @@ const Sidebar = () => {
           }
         />
         <div className="sidebar__headerRight">
-          <IconButton onClick={() => console.log(currentRoom)}>
-            <ChatIcon />
-          </IconButton>
-          {/* <IconButton onClick={optionsClick}>
+          <IconButton onClick={() => console.log(people, room)}>
             <MoreVertIcon />
-          </IconButton> */}
-          <IconButton onClick={signout}>
-            <ExitToAppIcon />
           </IconButton>
+          <IconButton onClick={optionsClick}>
+            <MoreVertIcon />
+          </IconButton>
+          {/* <IconButton onClick={}>
+            <ExitToAppIcon />
+          </IconButton> */}
           {/* Menu */}
-          {/* <Menu
+          <Menu
             id="simple-menu"
             anchorEl={anchorEl}
             keepMounted
             open={Boolean(anchorEl)}
             onClose={optionsClose}
           >
-            <MenuItem onClick={optionsClose}>Profile</MenuItem>
-            <MenuItem onClick={optionsClose}>My account</MenuItem>
-            <MenuItem onClick={optionsClose}>Logout</MenuItem>
-          </Menu> */}
+            <MenuItem>
+              <ProfileModal onSubmit={userNameUpdate} onDelAcc={onDelAcc} />
+            </MenuItem>
+            <MenuItem onClick={signout}>Logout</MenuItem>
+          </Menu>
           {/*  */}
         </div>
       </div>

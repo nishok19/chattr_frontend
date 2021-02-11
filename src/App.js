@@ -84,10 +84,37 @@ const App = () => {
     channelRoom.bind("inserted", (room) => {
       // alert(JSON.stringify(data));
       console.log("pusher room", room);
+      if (room.users[0] === user?.email) {
+        dispatch({
+          type: actionTypes.INSERT_NEW_ROOM,
+          room: room,
+        });
+      }
+    });
+
+    channelRoom.bind("deleted", (room) => {
+      console.log("pusher room deletion", room);
+
       dispatch({
-        type: actionTypes.INSERT_NEW_ROOM,
-        room: room,
+        type: actionTypes.DELETE_ROOM,
+        roomId: room.roomId._id,
       });
+
+      // User pusher
+
+      // const channelUsers = pusher.subscribe("users");
+      // channelUsers.bind("updated", (res) => {
+      //   console.log("pusher user", res);
+      //   if (res.data !== user?.email) {
+      //     dispatch({
+      //       type: actionTypes.USER_LEFT,
+      //       roomId: res.roomId,
+      //       user: res.data,
+      //     });
+      //   } else {
+      //     console.log("user has left and has to be removed");
+      //   }
+      // });
     });
 
     return () => {
