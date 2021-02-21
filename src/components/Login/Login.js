@@ -107,6 +107,7 @@ const Login = () => {
               type: actionTypes.SET_USER,
               user: res.data.user,
             });
+            history.push("/rooms");
           } else if (!userData.userExists) {
             setError("user does not exists... First sign up");
             // history.push("/signup");
@@ -157,6 +158,9 @@ const Login = () => {
               type: actionTypes.SET_USER,
               user: res.data.user,
             });
+            //
+            history.push("/rooms");
+            //
           } else if (!userData.userExists) {
             setError("user does not exists... First sign up");
             // history.push("/signup");

@@ -53,11 +53,13 @@ const App = () => {
           if (userData.userExists) {
             // Executing only if the server sends that the {userExists:true}
             // setError("");
-            console.log("user exists");
             dispatch({
               type: actionTypes.SET_USER,
               user: res.data.user,
             });
+            //
+            // history.push("/rooms");
+            //
           } else if (!userData.userExists) {
             // setError("user does not exists... First sign up");
             history.push("/login");
@@ -133,19 +135,22 @@ const App = () => {
             <Route exact path="/login" component={Login} />
 
             <Route exact path="/signup" component={Signup} />
+
+            <Route component={Home} />
           </Switch>
         </Router>
       ) : (
         <div className="app__body">
           <Router>
             <Switch>
-              <Route path="/">
+              <Route path="/rooms">
                 <Sidebar />
                 <Route exact path="/rooms/:roomId">
                   <Chat />
                   <Detailsbar />
                 </Route>
               </Route>
+              <Route component={Sidebar} />
             </Switch>
           </Router>
         </div>

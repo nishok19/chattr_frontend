@@ -42,15 +42,24 @@ const reducer = (state, action) => {
       };
 
     case actionTypes.SET_MESSAGE: {
-      const roomIndex = state.room.filter((r) => r._id === action.roomId)[0];
-      const index = state.room.findIndex((room) => room._id === action.roomId);
+      const stateRoom = [...state.room];
+      const roomIndex = stateRoom.filter((r) => r._id === action.roomId)[0];
+      const index = stateRoom.findIndex((room) => room._id === action.roomId);
       const addedMsg = roomIndex.data.concat(action.msg);
-      const actualRooms = state.room;
-      roomIndex.data = addedMsg;
-      actualRooms.splice(index, 1, roomIndex);
+      // const actualRooms = [...state.room];
+      const uniqueMsgs = addedMsg
+        .map((e) => e["_id"])
+        .map((e, i, final) => final.indexOf(e) === i && i)
+        .filter((obj) => addedMsg[obj])
+        .map((e) => addedMsg[e]);
+
+      roomIndex.data = uniqueMsgs;
+      stateRoom.splice(index, 1, roomIndex);
+      console.log("reducer msg", addedMsg, roomIndex, stateRoom);
+
       return {
         ...state,
-        room: actualRooms,
+        room: stateRoom,
       };
     }
 
@@ -127,15 +136,6 @@ const reducer = (state, action) => {
       roomToAlter.users = action.users;
       stateRooms.splice(indexOfAlterRoom, 1, roomToAlter);
 
-      // const statePeople = state.people;
-      // const alterPeople = action.users.map((u) =>
-      //   state.people.filter((p) => p.email === u)
-      // );
-      // const alterPeople = action.users.map((u) => {
-      //   statePeople.filter((p) => p.email === u);
-      // });
-
-      // console.log("user left", action.users);
       return {
         ...state,
         room: stateRooms,

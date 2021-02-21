@@ -23,7 +23,7 @@ const Chat = () => {
   const [roomName, setRoomName] = useState("");
   const [anchorEl, setAnchorEl] = useState(null);
   const [messages, setMessages] = useState([]);
-  const [{ user, room, jwt }, dispatch] = useStateValue();
+  const [{ user, room, jwt, people }, dispatch] = useStateValue();
 
   // new thing PUSHER
   useEffect(() => {
@@ -36,28 +36,28 @@ const Chat = () => {
     channelRoom.bind("updated", (data) => {
       console.log("i am testing", data);
       //
-      if (data.type === "messageUpdate") {
+      if (data.type == "messageUpdate") {
         const msg = data?.data;
 
         const msgData = Object.values(msg)[1];
-        console.log("i am chat", msgData);
-        if (msgData) {
-          const isRoomFound = room.find((r) => r._id === data.roomId._id);
-          if (isRoomFound) {
-            const msgRoomId = data.roomId._id;
-            // updatedRoom = room.filter((r) => r._id == roomId);
+        // if (msgData) {
+        const isRoomFound = room.find((r) => r._id === data.roomId._id);
+        if (isRoomFound) {
+          const msgRoomId = data.roomId._id;
+          console.log("i am chat", msgData);
 
-            dispatch({
-              type: actionTypes.SET_MESSAGE,
-              roomId: msgRoomId,
-              msg: msgData,
-            });
+          dispatch({
+            type: actionTypes.SET_MESSAGE,
+            roomId: msgRoomId,
+            msg: msgData,
+          });
+          console.log("chat", msgData);
 
-            setMessages(() =>
-              msgRoomId === msgRoomId ? [...messages, msgData] : [...messages]
-            );
-          }
+          // setMessages(() =>
+          //   msgRoomId === msgRoomId ? [...messages, msgData] : [...messages]
+          // );
         }
+        // }
       } else if (data.type === "userUpdate") {
         console.log("i am second chat", data);
         const isRoomFound = room.find((r) => r._id === data.roomId._id);
@@ -67,7 +67,6 @@ const Chat = () => {
               .get("/rooms", {
                 headers: {
                   "Content-Type": "application/json",
-                  // user: user.email,
                   Authorization: jwt,
                 },
               })
@@ -76,12 +75,10 @@ const Chat = () => {
                 dispatch({
                   type: actionTypes.SET_ROOM,
                   room: res.data.data.map((room) => room),
-                  // room: res.data.room,
                 });
                 dispatch({
                   type: actionTypes.SET_PEOPLE,
                   people: res.data.peoples.map((p) => p),
-                  // room: res.data.room,
                 });
 
                 console.log("fetched the rooms", res);
@@ -115,23 +112,12 @@ const Chat = () => {
       channelRoom.unbind_all();
       channelRoom.unsubscribe();
     };
-  }, [roomId, messages]);
+  }, [roomId, room]);
 
   // new thing__end PUSHER
 
   useEffect(() => {
     if (roomId) {
-      //   db.collection("rooms")
-      //     .doc(roomId)
-      //     .onSnapshot((snapshot) => setRoomName(snapshot.data().name));
-      //   db.collection("rooms")
-      //     .doc(roomId)
-      //     .collection("messages")
-      //     .orderBy("timestamp", "asc")
-      //     .onSnapshot((snapshot) =>
-      //       setMessages(snapshot.docs.map((doc) => doc.data()))
-      //     );
-
       const room_data = room.filter((room) => {
         return room._id == roomId;
       })[0];
@@ -142,7 +128,7 @@ const Chat = () => {
         room: room_data?._id,
       });
     }
-  }, [roomId, room, messages]);
+  }, [roomId, room]);
 
   useEffect(() => {
     setSeed(Math.floor(Math.random() * 5000));
@@ -150,21 +136,22 @@ const Chat = () => {
 
   const sendMessage = async (e) => {
     e.preventDefault();
+    if (input !== "") {
+      await axios
+        .put(`/rooms/${roomId}`, {
+          message: input,
+          name: user.name,
+          timestamp: Date.now(),
+        })
+        .then((res) => {
+          console.log(res);
+        })
+        .catch((err) => console.log(err));
 
-    await axios
-      .put(`/rooms/${roomId}`, {
-        message: input,
-        name: user.name,
-        timestamp: Date.now(),
-      })
-      .then((res) => {
-        console.log(res);
-      })
-      .catch((err) => console.log(err));
+      setInput("");
+    }
 
     // setMessages([...messages]);
-
-    setInput("");
   };
 
   // Menu Opening and Closing
@@ -228,12 +215,6 @@ const Chat = () => {
           {/* </p> */}
         </div>
         <div className="chat__headerRight">
-          {/* <IconButton>
-            <SearchOutlined />
-          </IconButton>
-          <IconButton>
-            <AttachFile />
-          </IconButton> */}
           <IconButton onClick={optionsClick}>
             <MoreVertIcon />
           </IconButton>

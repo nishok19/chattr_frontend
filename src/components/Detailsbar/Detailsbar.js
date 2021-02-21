@@ -19,6 +19,7 @@ const Detailsbar = () => {
   const { roomId } = useParams();
   const [inputValue, setInputValue] = useState("");
   const [roomName, setRoomName] = useState("");
+  const [thisRoomId, setThisRoomId] = useState("");
   const [seed, setSeed] = useState("");
 
   useEffect(() => {
@@ -27,21 +28,21 @@ const Detailsbar = () => {
     })[0];
     setRoomUsers(room_data?.users);
     setRoomName(room_data?.name);
-    console.log("roomUsers", roomUsers);
+    setThisRoomId(room_data?._id);
   }, [roomId, room, people, roomUsers]);
 
-  // useEffect(() => {
-  //   if (user.photoURL == null) {
-  //     setSeed(Math.floor(Math.random() * 5000));
-  //   }
-  // }, []);
+  useEffect(() => {
+    if (user.photoURL == null) {
+      setSeed(Math.floor(Math.random() * 5000));
+    }
+  }, []);
 
   const onSubmit = async () => {
     if (inputValue) {
       await axios
         .post(`/rooms/${roomId}`, {
           user: inputValue,
-          room: roomName,
+          room: thisRoomId,
         })
         .then((res) => console.log(res))
         .catch((err) => console.log(err));

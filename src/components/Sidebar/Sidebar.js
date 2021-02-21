@@ -50,8 +50,6 @@ const Sidebar = () => {
               people: res.data.peoples.map((p) => p),
               // room: res.data.room,
             });
-
-            console.log("fetched the rooms", res);
           })
           .catch((err) => {
             console.log("error fetching rooms", err);
