@@ -34,7 +34,7 @@ const reducer = (state, action) => {
 
     case actionTypes.INSERT_NEW_ROOM:
       const userRoomAdd = state.user;
-      userRoomAdd.rooms = state.user.rooms.concat(action.room.name);
+      userRoomAdd.rooms = state.user.rooms.concat(action.room._id);
       return {
         ...state,
         room: [...state.room, action.room],

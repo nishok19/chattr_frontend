@@ -179,10 +179,11 @@ const Sidebar = () => {
               : `https://avatars.dicebear.com/api/human/${seed}.svg`
           }
         />
+        <span>{user.name}</span>
         <div className="sidebar__headerRight">
-          <IconButton onClick={() => console.log(people, room)}>
+          {/* <IconButton onClick={() => console.log(currentRoom)}>
             <MoreVertIcon />
-          </IconButton>
+          </IconButton> */}
           <IconButton onClick={optionsClick}>
             <MoreVertIcon />
           </IconButton>
@@ -221,6 +222,7 @@ const Sidebar = () => {
             key={r._id}
             id={r._id}
             name={r.name}
+            data={r.data}
             // selected={r._id === roomId}
           />
         ))}

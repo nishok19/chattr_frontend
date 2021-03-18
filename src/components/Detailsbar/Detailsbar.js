@@ -6,7 +6,8 @@ import { Avatar, IconButton } from "@material-ui/core";
 // import MoreVertIcon from "@material-ui/icons/MoreVert";
 // import AddIcon from "@material-ui/icons/Add";
 // import PersonAddRoundedIcon from "@material-ui/icons/PersonAddRounded";
-import { Button } from "@material-ui/core";
+// import { Button } from "@material-ui/core";
+import Snackbar from "@material-ui/core/Snackbar";
 
 import axios from "../../axios";
 import { actionTypes } from "../../reducer";
@@ -21,6 +22,7 @@ const Detailsbar = () => {
   const [roomName, setRoomName] = useState("");
   const [thisRoomId, setThisRoomId] = useState("");
   const [seed, setSeed] = useState("");
+  const [snackBarOpen, setSnackBarOpen] = useState(false);
 
   useEffect(() => {
     const room_data = room.filter((room) => {
@@ -42,20 +44,34 @@ const Detailsbar = () => {
       await axios
         .post(`/rooms/${roomId}`, {
           user: inputValue,
-          room: thisRoomId,
+          room: thisRoomId.trim(),
         })
-        .then((res) => console.log(res))
+        .then((res) => {
+          if (!res.data.userExists) {
+            // const handleClick = () => {
+            setSnackBarOpen(true);
+            console.log("Detailsbar add user: ", res);
+            // };
+          }
+        })
         .catch((err) => console.log(err));
     }
 
-    setInputValue("");
+    // setInputValue("");
+  };
+
+  const snackBarClose = (event, reason) => {
+    if (reason === "clickaway") {
+      return;
+    }
+
+    setSnackBarOpen(false);
   };
 
   return (
     <div className="details">
       <div className="details__header">
         <h2>People</h2>
-
         <UserModal
           inputValue={inputValue}
           setInputValue={setInputValue}
@@ -81,41 +97,29 @@ const Detailsbar = () => {
         )}
       </div>
 
-      {/* <Avatar
-        src={
-          user.photoURL
-            ? user.photoURL
-            : `https://avatars.dicebear.com/api/human/${seed}.svg`
-        }
-        /> */}
-      {/* <div className="sidebar__headerRight">
-          <IconButton>
-            <ExitToAppIcon />
-          </IconButton>
-          <IconButton>
-            <ChatIcon />
-          </IconButton>
-          <IconButton>
-            <MoreVertIcon />
-          </IconButton>
-        </div>
-      </div>*/}
-      {/* 
-      <div className="sidebar__search">
-        <IconButton>
-          <AddIcon />
-        </IconButton>
-        <div className="sidebar__searchContainer">
-          <input placeholder="Search or start new chat" type="text" />
-        </div>
-      </div> */}
+      {/* Snackbar */}
 
-      {/* <div className="sidebar__chats"> */}
-      {/* <SidebarChat addNewChat /> */}
-      {/* {room.map((r) => (
-            <SidebarChat key={r._id} id={r._id} name={r.name} />
-          ))} */}
-      {/* </div> */}
+      <div>
+        <Snackbar
+          anchorOrigin={{
+            vertical: "bottom",
+            horizontal: "left",
+          }}
+          open={snackBarOpen}
+          autoHideDuration={6000}
+          onClose={snackBarClose}
+          message={`User "${inputValue}" was not found ...!! Enter a valid user`}
+          // action={
+          //   <React.Fragment>
+          //     {/* <IconButton size="small" aria-label="close" color="inherit" onClick={handleClose}>
+          //     <CloseIcon fontSize="small" />
+          //   </IconButton> */}
+          //   </React.Fragment>
+          // }
+        />
+      </div>
+
+      {/* Snackbar End */}
     </div>
   );
 };

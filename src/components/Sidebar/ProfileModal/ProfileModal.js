@@ -26,6 +26,7 @@ const ProfileModal = ({ onSubmit, onDelAcc }) => {
   };
 
   const handleClose = () => {
+    setUserName(user.name);
     setOpen(false);
     setOpenConfirm(false);
     setIsDisabled(true);
@@ -33,7 +34,7 @@ const ProfileModal = ({ onSubmit, onDelAcc }) => {
   };
 
   const handleSubmit = () => {
-    setOpenConfirm(true);
+    userName != user.name && setOpenConfirm(true);
   };
 
   const onConfirmSubmit = () => {
@@ -95,11 +96,12 @@ const ProfileModal = ({ onSubmit, onDelAcc }) => {
           <Button
             className="profile__delete__button"
             onClick={() => setOpenDel(true)}
+            color="secondary"
           >
             Delete Account
           </Button>
           <DialogContentText>
-            This will delete your account completely.
+            This will delete your account permanently.
           </DialogContentText>
         </DialogContent>
         <DialogActions>

@@ -14,6 +14,7 @@ const UserModal = ({ inputValue, setInputValue, onSubmit, name }) => {
 
   const handleClickOpen = () => {
     setOpen(true);
+    setInputValue("")
   };
 
   const handleClose = () => {
