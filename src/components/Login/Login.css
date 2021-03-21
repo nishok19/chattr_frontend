@@ -1,9 +1,20 @@
 .login {
-  background-color: #f8f8f8;
+  background: url("../../pics/pexels-kyle-roxas-2138922.jpg");
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: cover;
   height: 100vh;
   width: 100vw;
   display: grid;
   place-items: center;
+}
+
+.login__error {
+  text-align: center;
+  font-size: small;
+  margin-top: 1em;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  color: #e03c3c;
 }
 
 .login__container {
@@ -11,7 +22,6 @@
   background-color: white;
   border-radius: 7px;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 3px rgba(0, 0, 0, 0.5);
-  /*  */
   height: 100vh;
   width: 30vw;
   display: flex;
@@ -124,4 +134,8 @@
   font-size: medium;
   margin-top: 15px;
   text-align: center;
+}
+
+.login__input > .MuiFormControl-root {
+  padding: 7px;
 }

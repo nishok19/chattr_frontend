@@ -1,24 +1,19 @@
 .message__msg {
   position: relative;
   padding: 10px;
-  /* padding-bottom: 20px; */
   font-size: 14.2px;
-  background-color: rgb(211, 88, 190);
+  background-color: #9792ed;
   border-radius: 10px;
   width: fit-content;
   margin-bottom: 30px;
-
   display: flex;
   flex-direction: column;
-
-  /* display: table-cell;
-  vertical-align: bottom; */
 }
 
 .message__reciever {
   margin-left: auto;
   margin-right: 2.5em;
-  background-color: #a6ff00;
+  background-color: #9b9b9b65;
 }
 
 .message__name {

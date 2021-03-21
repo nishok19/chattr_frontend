@@ -20,8 +20,6 @@ const Signup = () => {
 
   const history = useHistory();
 
-  // useEffect(() => {
-  // }, []);
   const theme = createMuiTheme({
     palette: {
       primary: {
@@ -139,6 +137,14 @@ const Signup = () => {
     // setEmail(user?.email);
   };
 
+  const passCheck = () => {
+    if (password.length < 4) {
+      setError("Password must be atleast 4 characters");
+    } else {
+      setError("");
+    }
+  };
+
   return (
     <StylesProvider injectFirst>
       <ThemeProvider theme={theme}>
@@ -172,6 +178,7 @@ const Signup = () => {
                 variant="outlined"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
+                onBlur={passCheck}
               />
               <TextField
                 required
@@ -182,7 +189,7 @@ const Signup = () => {
                 value={confirmPass}
                 onChange={(e) => confirmPassword(e)}
               />
-              {error}
+              <span className="signup__error">{error}</span>
               <Button type="submit" className="signup__button">
                 Register
               </Button>

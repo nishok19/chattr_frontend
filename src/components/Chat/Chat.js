@@ -165,6 +165,7 @@ const Chat = () => {
 
   const sendMessage = async (e) => {
     e.preventDefault();
+    setInput("");
     if (input !== "") {
       await axios
         .put(`/rooms/${roomId}`, {
@@ -176,8 +177,6 @@ const Chat = () => {
           console.log(res);
         })
         .catch((err) => console.log(err));
-
-      setInput("");
     }
 
     // setMessages([...messages]);
@@ -287,14 +286,18 @@ const Chat = () => {
 
       {/* Chat Input Footer */}
       <div className="chat__footer">
-        <form>
+        <form onSubmit={sendMessage}>
           <input
             type="text"
             value={input}
             onChange={(e) => setInput(e.target.value)}
             placeholder="Enter a Message..."
           />
-          <IconButton onClick={sendMessage} type="submit">
+          {/* <button type="submit" className="chat__footer__submit">submit</button> */}
+          <IconButton
+            // onClick={sendMessage}
+            type="submit"
+          >
             <SendIcon />
             {/* Send a Message */}
           </IconButton>

@@ -100,9 +100,9 @@
   margin-left: 10px;
 }
 
-/* .chat__footer > form > button {
+.chat__footer__submit {
   display: none;
-} */
+}
 
 .chat__footer > .MuiSvgIcon-root {
   padding: 10px;

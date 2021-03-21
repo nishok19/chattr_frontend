@@ -162,7 +162,7 @@ const Login = () => {
             history.push("/rooms");
             //
           } else if (!userData.userExists) {
-            setError("user does not exists... First sign up");
+            setError("User does not exists... First sign up");
             // history.push("/signup");
           } else {
             setError("Something went wrong");
@@ -225,7 +225,7 @@ const Login = () => {
                 Sign In
               </Button>
             </form>
-            {error}
+            <span className="login__error">{error}</span>
             <span className="login__text2">Or</span>
             <Button
               onClick={signInWithGoogle}
@@ -236,7 +236,7 @@ const Login = () => {
 
             <hr />
             <span className="login__signup__text">
-              Does'nt have an account yet ?{" "}
+              Does'nt have an account yet ?
               <Link to="/signup" className="login__signup__text__link">
                 Sing Up
               </Link>
