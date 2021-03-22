@@ -10,12 +10,12 @@
     {
       "src": "DF_logo_192_108.png",
       "type": "image/png",
-      "sizes": "192x192"
+      "sizes": "192x108"
     },
     {
       "src": "DF_logo.png",
       "type": "image/png",
-      "sizes": "512x512"
+      "sizes": "1920x1080"
     }
   ],
   "start_url": ".",
